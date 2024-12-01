@@ -1,10 +1,17 @@
 import express = require("express");
 import { Request, Response } from "express";
+import db from "../db/db";
 
 const router = express.Router();
 
 router.post("/process", (req: Request, res: Response) => {
-  return res.json({ id: crypto.randomUUID() })
+  try {
+    const id = db.process(req.body);
+    return res.json({ id })
+  } catch(e) {
+    res.status(400);
+    return res.json({ error: e.message });
+  }
 });
 
 router.get("/:id/points", (req: Request, res: Response) => {
