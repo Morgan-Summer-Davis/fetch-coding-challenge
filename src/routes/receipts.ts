@@ -17,7 +17,12 @@ router.post("/process", (req: Request, res: Response) => {
 router.get("/:id/points", (req: Request, res: Response) => {
   const id: string = req.params.id;
 
-  return res.json({ id });
+  try {
+    return res.json({ points: db.points(id) });
+  } catch(e) {
+    res.status(400);
+    return { error: e.message };
+  }
 });
 
 export default router;
