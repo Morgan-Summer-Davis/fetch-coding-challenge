@@ -7,6 +7,7 @@ export const isValidReceipt = (receipt: unknown): receipt is Receipt => {
     !Array.isArray(receipt) &&
     'retailer' in receipt &&
     typeof receipt.retailer === 'string' &&
+    isValidRetailer(receipt.retailer) &&
     'purchaseDate' in receipt &&
     typeof receipt.purchaseDate === 'string' &&
     isValidDate(receipt.purchaseDate) &&
@@ -18,6 +19,7 @@ export const isValidReceipt = (receipt: unknown): receipt is Receipt => {
     isValidPrice(receipt.total) &&
     'items' in receipt &&
     Array.isArray(receipt.items) &&
+    receipt.items.length > 0 &&
     receipt.items.every(item => isValidItem(item))
   );
 }
@@ -35,8 +37,16 @@ const isValidItem = (item: unknown): item is Item => {
   )
 }
 
+const isValidRetailer = (retailer: string) => {
+  return !!retailer.match(/^[\w\s\-&]+$/);
+}
+
+const isValidShortDescription = (shortDescription: string) => {
+  return !!shortDescription.match(/^[\w\s\-]+$/);
+}
+
 const isValidPrice = (price: string) => {
-  return (parseFloat(price).toFixed(2) === price)
+  return !!price.match(/^\d+\.\d{2}$/);
 }
 
 const isValidTime = (time: string) => {
