@@ -18,10 +18,10 @@ router.get("/:id/points", (req: Request, res: Response) => {
   const id: string = req.params.id;
 
   try {
-    return res.json({ points: db.points(id) });
+    return res.json({ points: db.getPoints(id) });
   } catch(e) {
     res.status(400);
-    return { error: e.message };
+    return res.json({ error: e.message });
   }
 });
 

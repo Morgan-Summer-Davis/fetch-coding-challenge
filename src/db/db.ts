@@ -2,28 +2,50 @@ import { Receipt } from "types";
 import { isValidReceipt } from "../utils/utils";
 
 class DB {
-  private data: { [id: string]: Receipt } = {}
+  private data: { [id: string]: { receipt: Receipt, points: number } } = {}
 
   process(receipt: Receipt) {
     if (!isValidReceipt(receipt)) throw new Error('Receipt is formatted incorrectly');
 
+    const points = this.calculatePoints(receipt);
     let id;
     do {
       id = crypto.randomUUID();
     } while (this.data[id] === null)
 
-    this.data[id] = receipt;
+    this.data[id] = { receipt, points };
     return id;
   }
 
-  points(id: string) {
+  getPoints(id: string) {
     const receipt = this.data[id];
-    if (!isValidReceipt(receipt)) throw new Error(`Receipt ${id} not found`);
+    if (receipt === undefined) throw new Error(`Receipt ${id} not found`);
 
+    return receipt.points;
+  }
+
+  private calculatePoints(receipt: Receipt) {
+    return (
+      this.calculateRetailerNamePoints(receipt) + 
+      this.calculatePriceTotalPoints(receipt) +
+      this.calculateItemPoints(receipt) +
+      this.calculatePurchaseTimePoints(receipt)
+    );
+  }
+
+  private calculateRetailerNamePoints(receipt: Receipt) {
+    return receipt.retailer.split('').filter(char => !!char.match(/[a-z\d]/i)).length;
+  }
+
+  private calculatePriceTotalPoints(receipt: Receipt) {
     let points = 0;
-    points += receipt.retailer.split('').filter(char => !!char.match(/[a-z\d]/i)).length;
     if (parseFloat(receipt.total) % 1.00 === 0.0) points += 50;
     if (parseFloat(receipt.total) % 0.25 === 0.0) points += 25;
+    return points;
+  }
+
+  private calculateItemPoints(receipt: Receipt) {
+    let points = 0;
     points += Math.floor(receipt.items.length / 2) * 5;
 
     receipt.items.forEach(item => {
@@ -31,6 +53,12 @@ class DB {
 
       points += Math.ceil(parseFloat(item.price) * 0.2);
     })
+
+    return points;
+  }
+
+  private calculatePurchaseTimePoints(receipt: Receipt) {
+    let points = 0;
 
     const purchaseDay = new Date(receipt.purchaseDate).getUTCDate();
     if (purchaseDay % 2 !== 0) points += 6;
