@@ -1,11 +1,13 @@
-import { Receipt } from "types";
-import { isValidReceipt } from "../utils/utils";
+import { Receipt } from '../types/types';
+import { isValidReceipt, normalizeDate } from '../utils/utils';
 
 class DB {
   private data: { [id: string]: { receipt: Receipt, points: number } } = {}
 
   process(receipt: Receipt) {
     if (!isValidReceipt(receipt)) throw new Error('Receipt is formatted incorrectly');
+
+    receipt.purchaseDate = normalizeDate(receipt.purchaseDate);
 
     const points = this.calculatePoints(receipt);
     let id;
