@@ -1,12 +1,12 @@
 export interface Receipt {
-  retailer: string,
-  purchaseDate: string,
-  purchaseTime: string,
-  total: string,
-  items: Item[]
+  retailer: string;
+  purchaseDate: string;
+  purchaseTime: string;
+  total: string;
+  items: Item[];
 }
 
 export interface Item {
-  shortDescription: string,
-  price: string
+  shortDescription: string;
+  price: string;
 }
