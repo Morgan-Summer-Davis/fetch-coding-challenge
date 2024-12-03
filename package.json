@@ -4,9 +4,10 @@
   "description": "",
   "main": "./dist/server.js",
   "scripts": {
-    "test": "jest --watch",
+    "test": "jest",
     "dev": "nodemon src/server.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "start": "node dist/src/server.js"
   },
   "author": "Morgan Davis",
   "license": "ISC",
