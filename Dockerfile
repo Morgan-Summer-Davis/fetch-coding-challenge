@@ -3,8 +3,8 @@ WORKDIR /app
 COPY . .
 RUN npm install && \
     npm install typescript -g && \
-    npm run build && \
-    npm run test
+    npm run test && \
+    npm run build
 
 FROM node:alpine as prod
 WORKDIR /app
