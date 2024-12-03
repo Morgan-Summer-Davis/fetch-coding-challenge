@@ -79,7 +79,7 @@ describe('POST /receipts/process', () => {
   });
 
   test('400s with error if sent a receipt with an invalid purchase date', async () => {
-    const purchaseDates = ['12/23', '0', 'a', '2022(20(31', '2022-40-40', ''];
+    const purchaseDates = ['12/23', '0', 'a', '2022(20(31', '2022-40-40', '2022-12/12', ''];
 
     await Promise.all(purchaseDates.map(async purchaseDate => {
       resetReceipt();
