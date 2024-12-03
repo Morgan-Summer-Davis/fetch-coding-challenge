@@ -46,58 +46,115 @@ describe('getPoints', () => {
   });
 });
 
-describe("a receipt's points are increased by", () => {
-  let controlPoints: number;
-  beforeAll(() => controlPoints = db['calculatePoints'](controlReceipt));
+describe('points', () => {
+  test('are calculated correctly for receipts', () => {
+    receipt = {
+      "retailer": "Target",
+      "purchaseDate": "2022-01-01",
+      "purchaseTime": "13:01",
+      "items": [
+        {
+          "shortDescription": "Mountain Dew 12PK",
+          "price": "6.49"
+        },{
+          "shortDescription": "Emils Cheese Pizza",
+          "price": "12.25"
+        },{
+          "shortDescription": "Knorr Creamy Chicken",
+          "price": "1.26"
+        },{
+          "shortDescription": "Doritos Nacho Cheese",
+          "price": "3.35"
+        },{
+          "shortDescription": "   Klarbrunn 12-PK 12 FL OZ  ",
+          "price": "12.00"
+        }
+      ],
+      "total": "35.35"
+    };
 
-  test('1 for each alphanumeric character in the retailer name', () => {
-    receipt.retailer = 'abc & 123  '
-    const id = db.process(receipt);
-    expect(db.getPoints(id) - controlPoints).toEqual(6)
-  });
-
-  test('75 altogether if the total is a round dollar amount with no cents', () => {
-    receipt.total = '1000.00'
-    const id = db.process(receipt);
-    expect(db.getPoints(id) - controlPoints).toEqual(75);
-  });
-
-  test('25 points if the total is a multiple of 0.25', () => {
-    receipt.total = '32.75'
-    const id = db.process(receipt);
-    expect(db.getPoints(id) - controlPoints).toEqual(25);
-  });
-
-  test('5 points for every two items on the receipt', () => {
-    const item = { shortDescription: 'a', price: '0.00' };
-    receipt.items = Array(16).fill(item);
-    const id = db.process(receipt);
-    expect(db.getPoints(id) - controlPoints).toEqual(40);
-  });
-
-  test("0.2 times each item's price, rounded up, if the item's trimmed description's length is divisble by 3", () => {
-    const pointItem = { shortDescription: '   abc  ', price: '21.00' };
-    const otherItem = { shortDescription: 'a', price: '0.00' };
-
-    receipt.items = [otherItem, otherItem, otherItem, otherItem, otherItem];
     let id = db.process(receipt);
-    const points = db.getPoints(id) - controlPoints;
+    expect(db.getPoints(id)).toEqual(28);
 
-    resetReceipt();
-    receipt.items = [pointItem, pointItem, otherItem, pointItem, otherItem];
+    receipt = {
+      "retailer": "M&M Corner Market",
+      "purchaseDate": "2022-03-20",
+      "purchaseTime": "14:33",
+      "items": [
+        {
+          "shortDescription": "Gatorade",
+          "price": "2.25"
+        },{
+          "shortDescription": "Gatorade",
+          "price": "2.25"
+        },{
+          "shortDescription": "Gatorade",
+          "price": "2.25"
+        },{
+          "shortDescription": "Gatorade",
+          "price": "2.25"
+        }
+      ],
+      "total": "9.00"
+    }
+
     id = db.process(receipt);
-    expect(db.getPoints(id) - points).toEqual(15);
+    expect(db.getPoints(id)).toEqual(109);
   });
 
-  test('6 points if the day in the purchase date is odd', () => {
-    receipt.purchaseDate = '2022-01-01';
-    const id = db.process(receipt);
-    expect(db.getPoints(id) - controlPoints).toEqual(6);
-  });
-
-  test('10 points if the time of purchase is after 2:00pm and before 4:00pm', () => {
-    receipt.purchaseTime = '15:00';
-    const id = db.process(receipt);
-    expect(db.getPoints(id) - controlPoints).toEqual(10);
+  describe('are increased by', () => {
+    let controlPoints: number;
+    beforeAll(() => controlPoints = db['calculatePoints'](controlReceipt));
+  
+    test('1 for each alphanumeric character in the retailer name', () => {
+      receipt.retailer = 'abc & 123  '
+      const id = db.process(receipt);
+      expect(db.getPoints(id) - controlPoints).toEqual(6);
+    });
+  
+    test('75 altogether if the total is a round dollar amount with no cents', () => {
+      receipt.total = '1000.00'
+      const id = db.process(receipt);
+      expect(db.getPoints(id) - controlPoints).toEqual(75);
+    });
+  
+    test('25 points if the total is a multiple of 0.25', () => {
+      receipt.total = '32.75'
+      const id = db.process(receipt);
+      expect(db.getPoints(id) - controlPoints).toEqual(25);
+    });
+  
+    test('5 points for every two items on the receipt', () => {
+      const item = { shortDescription: 'a', price: '0.00' };
+      receipt.items = Array(16).fill(item);
+      const id = db.process(receipt);
+      expect(db.getPoints(id) - controlPoints).toEqual(40);
+    });
+  
+    test("0.2 times each item's price, rounded up, if the item's trimmed description's length is divisble by 3", () => {
+      const pointItem = { shortDescription: '   abc  ', price: '21.00' };
+      const otherItem = { shortDescription: 'a', price: '0.00' };
+  
+      receipt.items = [otherItem, otherItem, otherItem, otherItem, otherItem];
+      let id = db.process(receipt);
+      const points = db.getPoints(id) - controlPoints;
+  
+      resetReceipt();
+      receipt.items = [pointItem, pointItem, otherItem, pointItem, otherItem];
+      id = db.process(receipt);
+      expect(db.getPoints(id) - points).toEqual(15);
+    });
+  
+    test('6 points if the day in the purchase date is odd', () => {
+      receipt.purchaseDate = '2022-01-01';
+      const id = db.process(receipt);
+      expect(db.getPoints(id) - controlPoints).toEqual(6);
+    });
+  
+    test('10 points if the time of purchase is after 2:00pm and before 4:00pm', () => {
+      receipt.purchaseTime = '15:00';
+      const id = db.process(receipt);
+      expect(db.getPoints(id) - controlPoints).toEqual(10);
+    });
   });
 });
