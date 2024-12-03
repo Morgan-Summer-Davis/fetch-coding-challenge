@@ -8,7 +8,7 @@ docker compose up --build
 
 The application does not require any prior configuration.
 
-The API is exposed on port `3000`, and can thus be accessed bysending requests to `localhost:3000/receipts/process` or `localhost:3000/receipts/:id/points`.
+The API is exposed on port `3000`, and can thus be accessed by sending requests to `localhost:3000/receipts/process` or `localhost:3000/receipts/:id/points`.
 
 Design Decisions
 ---
